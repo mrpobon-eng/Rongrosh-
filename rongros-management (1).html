@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>রঙ-রস ব্যবস্থাপনা</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f4f0;--surface:#ffffff;--surface2:#f9f8f5;--border:#e2e0d8;
+  --text:#1a1a18;--text2:#5a5a55;--text3:#9a9a92;
+  --blue:#1a56db;--blue-l:#eef3ff;--blue-d:#1240a8;
+  --green:#0f6e56;--green-l:#e1f5ee;--green-d:#085041;
+  --red:#a32d2d;--red-l:#fcebeb;--amber:#854f0b;--amber-l:#faeeda;
+  --radius:10px;--shadow:0 1px 4px rgba(0,0,0,.08);
+}
+body{font-family:'Hind Siliguri',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+
+/* NAV */
+.nav{background:#1f3864;padding:0 16px;display:flex;align-items:center;gap:0;position:sticky;top:0;z-index:100}
+.nav-brand{color:#fff;font-size:16px;font-weight:700;padding:14px 0;margin-right:16px;white-space:nowrap}
+.nav-brand span{color:#9FE1CB;font-size:12px;font-weight:400;display:block;line-height:1}
+.nav-tabs{display:flex;gap:0;overflow-x:auto;-webkit-overflow-scrolling:touch;flex:1}
+.nav-tab{padding:14px 16px;color:rgba(255,255,255,.65);font-size:13px;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;border:none;background:none;font-family:inherit;transition:all .15s}
+.nav-tab:hover{color:rgba(255,255,255,.9)}
+.nav-tab.active{color:#fff;border-bottom:3px solid #9FE1CB}
+
+/* MAIN */
+.main{max-width:900px;margin:0 auto;padding:16px}
+
+/* SECTION */
+.section{display:none}.section.active{display:block}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+
+/* FORM */
+.fg{margin-bottom:10px}
+.fl{display:block;font-size:12px;color:var(--text2);margin-bottom:4px;font-weight:600}
+.fi{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
+.fi:focus{border-color:var(--blue)}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.r4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px}
+@media(max-width:600px){.r4{grid-template-columns:1fr 1fr}.r3{grid-template-columns:1fr 1fr}.r2{grid-template-columns:1fr}}
+
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:8px;border:none;font-size:13px;font-family:inherit;cursor:pointer;font-weight:600;transition:opacity .15s}
+.btn:hover{opacity:.85}
+.btn-p{background:#1f3864;color:#fff}
+.btn-s{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-g{background:var(--green);color:#fff}
+.btn-r{background:var(--red-l);color:var(--red)}
+.btn-sm{padding:4px 10px;font-size:12px;border-radius:6px}
+
+/* SUMMARY CARDS */
+.sums{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.sc{border-radius:var(--radius);padding:12px 14px;border:1px solid var(--border)}
+.sc .sl{font-size:11px;color:var(--text2);margin-bottom:4px;font-weight:600}
+.sc .sv{font-size:18px;font-weight:700;color:var(--text)}
+.sc.b{background:var(--blue-l);border-color:#b5d4f4}.sc.b .sv{color:var(--blue-d)}
+.sc.g{background:var(--green-l);border-color:#5dcaa5}.sc.g .sv{color:var(--green-d)}
+.sc.r{background:var(--red-l);border-color:#f09595}.sc.r .sv{color:var(--red)}
+.sc.a{background:var(--amber-l);border-color:#ef9f27}.sc.a .sv{color:var(--amber)}
+@media(max-width:500px){.sums{grid-template-columns:1fr 1fr}}
+
+/* TABLE */
+.tw{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:500px}
+th{background:var(--surface2);color:var(--text2);font-weight:700;padding:9px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:var(--surface2)}
+.erow td{color:var(--text3);text-align:center;padding:28px;font-size:13px}
+
+/* BADGE */
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
+.badge-ok{background:var(--green-l);color:var(--green-d)}
+.badge-low{background:var(--amber-l);color:var(--amber)}
+.badge-warn{background:var(--red-l);color:var(--red)}
+.badge-blue{background:var(--blue-l);color:var(--blue-d)}
+
+/* SLIP */
+.slip{border:2px solid var(--border);border-radius:var(--radius);padding:24px;background:#fff;max-width:480px;margin:0 auto}
+.slip-logo{text-align:center;margin-bottom:16px}
+.slip-logo h2{font-size:20px;font-weight:800;color:#1f3864}
+.slip-logo p{font-size:12px;color:var(--text2)}
+.slip-divider{height:1px;background:var(--border);margin:12px 0}
+.slip-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:14px}
+.slip-row .lbl{color:var(--text2)}
+.slip-row .val{font-weight:700;color:var(--text)}
+.slip-total{background:#1f3864;border-radius:8px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.slip-total .lbl{color:rgba(255,255,255,.8);font-size:13px}
+.slip-total .val{color:#9FE1CB;font-size:20px;font-weight:800}
+.sign-area{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px}
+.sign-box{border-top:1px solid var(--border);padding-top:6px;font-size:11px;color:var(--text3);text-align:center}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1f3864;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+
+/* PRINT */
+@media print{.nav,.no-print{display:none!important}.slip{border:1px solid #ccc;box-shadow:none}}
+
+/* LOADING */
+.loading{text-align:center;padding:30px;color:var(--text3);font-size:13px}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">রঙ-রস<span>সাতমাথা, রংপুর</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="sw('hisab',this)">💰 হিসাব</button>
+    <button class="nav-tab" onclick="sw('stock',this)">📦 স্টক</button>
+    <button class="nav-tab" onclick="sw('betna',this)">👤 বেতন স্লিপ</button>
+  </div>
+</nav>
+
+<div class="main">
+
+<!-- ═══════════ হিসাব ═══════════ -->
+<div class="section active" id="sec-hisab">
+  <div class="card">
+    <div class="card-title">📝 নতুন দিনের হিসাব যোগ করুন</div>
+    <div class="r2">
+      <div class="fg"><label class="fl">তারিখ</label><input type="date" class="fi" id="h-date"></div>
+      <div class="fg"><label class="fl">মাস নির্বাচন (ফিল্টার)</label>
+        <select class="fi" id="h-filter" onchange="renderHisab()">
+          <option value="">সব মাস</option>
+        </select>
+      </div>
+    </div>
+    <div class="r2">
+      <div class="fg"><label class="fl">☀️ দিন শিফট বিক্রয় (৳)</label><input type="number" class="fi" id="h-s1" placeholder="০" min="0"></div>
+      <div class="fg"><label class="fl">🌙 রাত শিফট বিক্রয় (৳)</label><input type="number" class="fi" id="h-s2" placeholder="০" min="0"></div>
+    </div>
+    <div class="r3">
+      <div class="fg"><label class="fl">মালামাল কেনা (৳)</label><input type="number" class="fi" id="h-kena" placeholder="০" min="0"></div>
+      <div class="fg"><label class="fl">বেতন (৳)</label><input type="number" class="fi" id="h-sal" placeholder="০" min="0"></div>
+      <div class="fg"><label class="fl">বিদ্যুৎ বিল (৳)</label><input type="number" class="fi" id="h-bid" placeholder="০" min="0"></div>
+    </div>
+    <div class="r2" style="margin-bottom:12px">
+      <div class="fg"><label class="fl">ভাড়া (৳)</label><input type="number" class="fi" id="h-bha" placeholder="০" min="0"></div>
+      <div class="fg"><label class="fl">অন্যান্য খরচ (৳)</label><input type="number" class="fi" id="h-oth" placeholder="০" min="0"></div>
+    </div>
+    <button class="btn btn-p" onclick="addHisab()">+ হিসাব সংরক্ষণ করুন</button>
+  </div>
+
+  <div class="sums" id="h-sums" style="display:none">
+    <div class="sc b"><div class="sl">মোট বিক্রয়</div><div class="sv" id="hs-bik">৳০</div></div>
+    <div class="sc r"><div class="sl">মোট খরচ</div><div class="sv" id="hs-kh">৳০</div></div>
+    <div class="sc g" id="hs-netcard"><div class="sl" id="hs-netlbl">নেট লাভ</div><div class="sv" id="hs-net">৳০</div></div>
+  </div>
+
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th>তারিখ</th><th>দিন বিক্রয়</th><th>রাত বিক্রয়</th>
+        <th>মোট বিক্রয়</th><th>মোট খরচ</th><th>লাভ/ক্ষতি</th>
+        <th class="no-print"></th>
+      </tr></thead>
+      <tbody id="h-tb"><tr class="erow"><td colspan="7">লোড হচ্ছে...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════ স্টক ═══════════ -->
+<div class="section" id="sec-stock">
+  <div class="card">
+    <div class="card-title">📦 পণ্য যোগ করুন / আপডেট করুন</div>
+    <div class="r4">
+      <div class="fg"><label class="fl">পণ্যের নাম</label><input type="text" class="fi" id="st-nm" placeholder="যেমন: রসগোল্লা"></div>
+      <div class="fg"><label class="fl">ক্রয়মূল্য (৳)</label><input type="number" class="fi" id="st-bu" placeholder="০" min="0"></div>
+      <div class="fg"><label class="fl">বিক্রয়মূল্য (৳)</label><input type="number" class="fi" id="st-se" placeholder="০" min="0"></div>
+      <div class="fg"><label class="fl">পরিমাণ</label><input type="number" class="fi" id="st-qt" placeholder="০" min="0"></div>
+    </div>
+    <div class="fg" style="margin-bottom:12px">
+      <label class="fl">সর্বনিম্ন মজুদ (এর নিচে গেলে সতর্কতা)</label>
+      <input type="number" class="fi" id="st-mn" placeholder="৫" min="0" style="max-width:200px">
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="btn btn-p" onclick="addStock()">+ পণ্য সংরক্ষণ</button>
+      <span id="st-msg" style="font-size:13px"></span>
+    </div>
+  </div>
+
+  <div class="sums" id="st-sums" style="display:none">
+    <div class="sc b"><div class="sl">মোট পণ্য</div><div class="sv" id="ss-tot">০</div></div>
+    <div class="sc a"><div class="sl">স্টক বিনিয়োগ মূল্য</div><div class="sv" id="ss-val">৳০</div></div>
+    <div class="sc g"><div class="sl">সম্ভাব্য মোট লাভ</div><div class="sv" id="ss-pro">৳০</div></div>
+  </div>
+
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th>পণ্য</th><th>ক্রয়মূল্য</th><th>বিক্রয়মূল্য</th>
+        <th>পরিমাণ</th><th>একক লাভ</th><th>লাভ%</th><th>অবস্থা</th>
+        <th class="no-print"></th>
+      </tr></thead>
+      <tbody id="st-tb"><tr class="erow"><td colspan="8">লোড হচ্ছে...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════ বেতন ═══════════ -->
+<div class="section" id="sec-betna">
+  <div class="r2" style="gap:14px;align-items:start">
+    <div>
+      <div class="card">
+        <div class="card-title">👤 কর্মচারীর তথ্য</div>
+        <div class="fg"><label class="fl">নাম</label><input type="text" class="fi" id="b-nm" placeholder="কর্মচারীর পুরো নাম"></div>
+        <div class="fg"><label class="fl">পদ / শিফট</label><input type="text" class="fi" id="b-po" placeholder="যেমন: দিন শিফট বিক্রয়কর্মী"></div>
+        <div class="fg"><label class="fl">মাস ও বছর</label><input type="month" class="fi" id="b-mo"></div>
+        <hr style="border:none;border-top:1px solid var(--border);margin:12px 0">
+        <div class="fg"><label class="fl">মূল বেতন (৳)</label><input type="number" class="fi" id="b-bas" placeholder="০" oninput="livSlip()"></div>
+        <div class="fg"><label class="fl">রাত শিফট ভাতা (৳)</label><input type="number" class="fi" id="b-nig" placeholder="০" oninput="livSlip()"></div>
+        <div class="fg"><label class="fl">বোনাস / অতিরিক্ত (৳)</label><input type="number" class="fi" id="b-bon" placeholder="০" oninput="livSlip()"></div>
+        <div class="fg"><label class="fl">অগ্রিম কর্তন (৳)</label><input type="number" class="fi" id="b-ded" placeholder="০" oninput="livSlip()"></div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="btn btn-p" style="flex:1" onclick="genSlip()">স্লিপ তৈরি করুন</button>
+          <button class="btn btn-s" onclick="window.print()">🖨️ প্রিন্ট</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div id="slip-empty" class="card" style="text-align:center;padding:40px 20px;color:var(--text3)">
+        বাম দিকে তথ্য দিয়ে<br>স্লিপ তৈরি করুন
+      </div>
+      <div class="slip" id="slip-box" style="display:none">
+        <div class="slip-logo">
+          <h2>🏪 রঙ-রস</h2>
+          <p>মিষ্টি ও কনফেকশনারি · সাতমাথা, রংপুর</p>
+          <p style="font-size:11px;color:var(--text3);margin-top:4px">বেতন স্লিপ — <span id="sl-mo"></span></p>
+        </div>
+        <div class="slip-divider"></div>
+        <div class="slip-row"><span class="lbl">কর্মচারীর নাম</span><span class="val" id="sl-nm">—</span></div>
+        <div class="slip-row"><span class="lbl">পদ / শিফট</span><span class="val" id="sl-po">—</span></div>
+        <div class="slip-divider"></div>
+        <div class="slip-row"><span class="lbl">মূল বেতন</span><span class="val" id="sl-bas">৳০</span></div>
+        <div class="slip-row"><span class="lbl">রাত শিফট ভাতা</span><span class="val" id="sl-nig">৳০</span></div>
+        <div class="slip-row"><span class="lbl">বোনাস</span><span class="val" id="sl-bon">৳০</span></div>
+        <div class="slip-divider"></div>
+        <div class="slip-row"><span class="lbl">মোট প্রাপ্য</span><span class="val" id="sl-gro">৳০</span></div>
+        <div class="slip-row"><span class="lbl" style="color:var(--red)">অগ্রিম কর্তন</span><span class="val" id="sl-ded" style="color:var(--red)">−৳০</span></div>
+        <div class="slip-total">
+          <span class="lbl">হাতে পাবেন</span>
+          <span class="val" id="sl-net">৳০</span>
+        </div>
+        <div class="sign-area">
+          <div class="sign-box"><div style="height:30px"></div>কর্মচারীর স্বাক্ষর</div>
+          <div class="sign-box"><div style="height:30px"></div>মালিকের স্বাক্ষর</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+const N = v => parseFloat(v) || 0;
+const TK = v => '৳' + Math.round(v).toLocaleString('bn-BD');
+const MONTHS = ['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
+let S = { hisab: [], stock: [] };
+
+// ── Storage helpers ──
+async function save(key, val) {
+  try { await window.storage.set(key, JSON.stringify(val)); } catch(e) {}
+}
+async function load(key) {
+  try { const r = await window.storage.get(key); return r ? JSON.parse(r.value) : null; } catch(e) { return null; }
+}
+
+// ── Toast ──
+function toast(msg, ok=true) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = ok ? '#0f6e56' : '#a32d2d';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── Tab switch ──
+function sw(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ══════ হিসাব ══════
+async function addHisab() {
+  const date = document.getElementById('h-date').value;
+  if (!date) { toast('তারিখ দিন!', false); return; }
+  const s1 = N(document.getElementById('h-s1').value);
+  const s2 = N(document.getElementById('h-s2').value);
+  if (s1 + s2 === 0) { toast('বিক্রয় পরিমাণ দিন!', false); return; }
+  const kh = N(document.getElementById('h-kena').value)+N(document.getElementById('h-sal').value)+N(document.getElementById('h-bid').value)+N(document.getElementById('h-bha').value)+N(document.getElementById('h-oth').value);
+  const ts = s1 + s2;
+  S.hisab.push({ date, s1, s2, ts, kh, net: ts - kh });
+  S.hisab.sort((a, b) => b.date.localeCompare(a.date));
+  await save('hisab', S.hisab);
+  ['h-s1','h-s2','h-kena','h-sal','h-bid','h-bha','h-oth'].forEach(id => document.getElementById(id).value = '');
+  updateMonthFilter();
+  renderHisab();
+  toast('হিসাব সংরক্ষণ হয়েছে ✓');
+}
+
+async function delHisab(i) {
+  if (!confirm('এই হিসাব মুছবেন?')) return;
+  S.hisab.splice(i, 1);
+  await save('hisab', S.hisab);
+  updateMonthFilter();
+  renderHisab();
+  toast('মুছে ফেলা হয়েছে');
+}
+
+function updateMonthFilter() {
+  const sel = document.getElementById('h-filter');
+  const cur = sel.value;
+  const months = [...new Set(S.hisab.map(h => h.date.slice(0,7)))].sort().reverse();
+  sel.innerHTML = '<option value="">সব মাস</option>' + months.map(m => {
+    const [y, mo] = m.split('-');
+    return `<option value="${m}" ${m===cur?'selected':''}>${MONTHS[parseInt(mo)-1]} ${y}</option>`;
+  }).join('');
+}
+
+function renderHisab() {
+  const filter = document.getElementById('h-filter').value;
+  const data = filter ? S.hisab.filter(h => h.date.startsWith(filter)) : S.hisab;
+  const tb = document.getElementById('h-tb');
+  if (!data.length) {
+    tb.innerHTML = '<tr class="erow"><td colspan="7">এখনো কোনো হিসাব নেই</td></tr>';
+    document.getElementById('h-sums').style.display = 'none';
+    return;
+  }
+  let tB=0, tK=0, tN=0;
+  tb.innerHTML = data.map((h, i) => {
+    tB+=h.ts; tK+=h.kh; tN+=h.net;
+    const realI = S.hisab.indexOf(h);
+    const d = new Date(h.date + 'T00:00:00');
+    const ds = d.toLocaleDateString('bn-BD', {day:'2-digit', month:'short', year:'numeric'});
+    const pc = h.net >= 0 ? 'var(--green-d)' : 'var(--red)';
+    const sg = h.net >= 0 ? '+' : '';
+    return `<tr>
+      <td><b>${ds}</b></td>
+      <td>${TK(h.s1)}</td><td>${TK(h.s2)}</td>
+      <td><b>${TK(h.ts)}</b></td>
+      <td>${TK(h.kh)}</td>
+      <td style="color:${pc};font-weight:700">${sg}${TK(Math.abs(h.net))}</td>
+      <td class="no-print"><button class="btn btn-r btn-sm" onclick="delHisab(${realI})">মুছুন</button></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('h-sums').style.display = 'grid';
+  document.getElementById('hs-bik').textContent = TK(tB);
+  document.getElementById('hs-kh').textContent = TK(tK);
+  document.getElementById('hs-net').textContent = (tN>=0?'+':'')+TK(Math.abs(tN));
+  const nc = document.getElementById('hs-netcard');
+  nc.className = 'sc ' + (tN >= 0 ? 'g' : 'r');
+  document.getElementById('hs-netlbl').textContent = tN >= 0 ? 'নেট লাভ' : 'নেট ক্ষতি';
+}
+
+// ══════ স্টক ══════
+async function addStock() {
+  const nm = document.getElementById('st-nm').value.trim();
+  const bu = N(document.getElementById('st-bu').value);
+  const se = N(document.getElementById('st-se').value);
+  const qt = N(document.getElementById('st-qt').value);
+  const mn = N(document.getElementById('st-mn').value) || 5;
+  if (!nm) { toast('পণ্যের নাম দিন!', false); return; }
+  if (!bu) { toast('ক্রয়মূল্য দিন!', false); return; }
+  // Update existing or add new
+  const ex = S.stock.findIndex(s => s.nm === nm);
+  if (ex >= 0) {
+    S.stock[ex] = { nm, bu, se, qt, mn };
+    toast(`"${nm}" আপডেট হয়েছে ✓`);
+  } else {
+    S.stock.push({ nm, bu, se, qt, mn });
+    toast(`"${nm}" যোগ হয়েছে ✓`);
+  }
+  await save('stock', S.stock);
+  ['st-nm','st-bu','st-se','st-qt','st-mn'].forEach(id => document.getElementById(id).value = '');
+  renderStock();
+}
+
+async function updQty(i, v) {
+  S.stock[i].qt = Math.max(0, N(v));
+  await save('stock', S.stock);
+  renderStockSums();
+  renderStockBadge(i);
+}
+
+function renderStockBadge(i) {
+  const s = S.stock[i];
+  const rows = document.getElementById('st-tb').querySelectorAll('tr');
+  if (rows[i]) {
+    const low = s.qt <= s.mn;
+    rows[i].querySelectorAll('td')[6].innerHTML = stockBadge(s);
+  }
+}
+
+function stockBadge(s) {
+  if (s.qt === 0) return '<span class="badge badge-warn">শেষ!</span>';
+  if (s.qt <= s.mn) return '<span class="badge badge-low">কম স্টক</span>';
+  return '<span class="badge badge-ok">ঠিক আছে</span>';
+}
+
+async function loadToEdit(i) {
+  const s = S.stock[i];
+  document.getElementById('st-nm').value = s.nm;
+  document.getElementById('st-bu').value = s.bu;
+  document.getElementById('st-se').value = s.se;
+  document.getElementById('st-qt').value = s.qt;
+  document.getElementById('st-mn').value = s.mn;
+  document.getElementById('st-nm').focus();
+  sw('stock', document.querySelector('.nav-tab:nth-child(2)'));
+}
+
+async function delStock(i) {
+  if (!confirm(`"${S.stock[i].nm}" মুছবেন?`)) return;
+  S.stock.splice(i, 1);
+  await save('stock', S.stock);
+  renderStock();
+  toast('পণ্য মুছে ফেলা হয়েছে');
+}
+
+function renderStockSums() {
+  document.getElementById('st-sums').style.display = S.stock.length ? 'grid' : 'none';
+  document.getElementById('ss-tot').textContent = S.stock.length + ' টি';
+  document.getElementById('ss-val').textContent = TK(S.stock.reduce((a,s)=>a+s.bu*s.qt,0));
+  document.getElementById('ss-pro').textContent = TK(S.stock.reduce((a,s)=>a+(s.se-s.bu)*s.qt,0));
+}
+
+function renderStock() {
+  const tb = document.getElementById('st-tb');
+  if (!S.stock.length) {
+    tb.innerHTML = '<tr class="erow"><td colspan="8">এখনো কোনো পণ্য নেই</td></tr>';
+    document.getElementById('st-sums').style.display = 'none';
+    return;
+  }
+  tb.innerHTML = S.stock.map((s, i) => {
+    const pp = s.se - s.bu;
+    const pct = s.bu > 0 ? ((pp/s.bu)*100).toFixed(0) : 0;
+    const pc = pp >= 0 ? 'var(--green-d)' : 'var(--red)';
+    return `<tr>
+      <td><b>${s.nm}</b></td>
+      <td>${TK(s.bu)}</td><td>${TK(s.se)}</td>
+      <td><input type="number" value="${s.qt}" min="0"
+        style="width:70px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-family:inherit;font-size:13px;text-align:center"
+        onchange="updQty(${i},this.value)"></td>
+      <td style="color:${pc};font-weight:700">${TK(pp)}</td>
+      <td style="color:${pc}">${pct}%</td>
+      <td>${stockBadge(s)}</td>
+      <td class="no-print" style="white-space:nowrap">
+        <button class="btn btn-s btn-sm" onclick="loadToEdit(${i})" style="margin-right:4px">✏️</button>
+        <button class="btn btn-r btn-sm" onclick="delStock(${i})">মুছুন</button>
+      </td>
+    </tr>`;
+  }).join('');
+  renderStockSums();
+}
+
+// ══════ বেতন স্লিপ ══════
+function livSlip() {
+  const bas=N(document.getElementById('b-bas').value), nig=N(document.getElementById('b-nig').value);
+  const bon=N(document.getElementById('b-bon').value), ded=N(document.getElementById('b-ded').value);
+  const gross=bas+nig+bon, net=gross-ded;
+  document.getElementById('sl-bas').textContent=TK(bas);
+  document.getElementById('sl-nig').textContent=TK(nig);
+  document.getElementById('sl-bon').textContent=TK(bon);
+  document.getElementById('sl-gro').textContent=TK(gross);
+  document.getElementById('sl-ded').textContent='−'+TK(ded);
+  document.getElementById('sl-net').textContent=TK(net);
+}
+
+function genSlip() {
+  const nm = document.getElementById('b-nm').value.trim();
+  if (!nm) { toast('কর্মচারীর নাম দিন!', false); return; }
+  document.getElementById('sl-nm').textContent = nm;
+  document.getElementById('sl-po').textContent = document.getElementById('b-po').value.trim() || '—';
+  const mo = document.getElementById('b-mo').value;
+  if (mo) {
+    const [y, m] = mo.split('-');
+    document.getElementById('sl-mo').textContent = MONTHS[parseInt(m)-1] + ' ' + y;
+  }
+  livSlip();
+  document.getElementById('slip-box').style.display = 'block';
+  document.getElementById('slip-empty').style.display = 'none';
+  toast('স্লিপ তৈরি হয়েছে ✓');
+}
+
+// ══════ Init ══════
+async function init() {
+  // Defaults
+  document.getElementById('h-date').value = new Date().toISOString().split('T')[0];
+  const now = new Date();
+  document.getElementById('b-mo').value = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+
+  // Load saved data
+  const h = await load('hisab'); if (h) S.hisab = h;
+  const st = await load('stock'); if (st) S.stock = st;
+
+  updateMonthFilter();
+  renderHisab();
+  renderStock();
+}
+
+init();
+</script>
+</body>
+</html>
